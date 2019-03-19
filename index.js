@@ -7,6 +7,7 @@ const server = express();
 server.use(express.json());
 
 server.get('/api/users', (req, res) => {
+    // console.log(req.body);
     db.find().then(users => {
         res.status(200).json(users);
     }).catch(error => {
@@ -29,20 +30,36 @@ server.get('/api/users/:id', (req, res) => {
 
 })
 
+// server.post('/api/users', (req, res) => {
+//     const userInfo = req.body
+//     console.log('user information', req.body);
+//     db.insert(userInfo)
+//     .then(users => {
+//         if (users.name || users.bio) {
+//             res.status(201).json(users);
+//         } else {
+//             res.status(400).json({ errorMessage: "Please provide name and bio for the user."})
+//         }        
+//     })
+//     .catch(error => {
+//         res.status(500).json({message: "There was an error while saving the user to the database"})
+//     });
+// });
+
 server.post('/api/users', (req, res) => {
-    const userInfo = req.body
+    const userInfo = req.body;
     console.log('user information', req.body);
-    db.insert(userInfo)
-    .then(users => {
-        if (users.name || users.bio) {
-            res.status(201).json(users);
-        } else {
-            res.status(400).json({ errorMessage: "Please provide name and bio for the user."})
-        }        
-    })
-    .catch(error => {
-        res.status(500).json({message: "There was an error while saving the user to the database"})
-    });
+    if (userInfo.name && userInfo.bio) {
+        db.insert(userInfo)
+        .then(users => {           
+                res.status(201).json(users);            
+        })
+        .catch(error => {
+            res.status(500).json({ message: "There was an error while saving the user to the database" })
+        })
+    } else {
+        res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
+    }
 });
 
 server.delete('/api/users/:id', (req, res) => {
